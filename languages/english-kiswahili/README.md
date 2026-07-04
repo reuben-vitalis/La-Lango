@@ -24,17 +24,23 @@ Kiswahili to La Lango AI directly serves over 200 million people.
 
 ## Dataset
 
-**Source of the parallel corpus:** Community collected - everyday conversational Kiswahili (Sanifu). Initial corpus of 20 sentence pairs covering common greetings and phrases, manually curated by contributor.
-**Corpus size:** 20 sentence pairs (initial — contributions welcome)
-**Domains covered:** Everyday conversation, greetings, common phrases, basic needs
-**License:** CC0 (Public Domain) — freely usable
+**Source of the parallel corpus:** QED English-Kiswahili parallel corpus subset.
+**Corpus size:** 3,000 sentence pairs
+**Domains covered:** Educational and conversational text
+**License:** See corpus LICENSE file from the QED dataset distribution
+
+This language pair currently uses a curated 3,000-pair subset from the larger QED English-Kiswahili corpus.
+
 **How to obtain the data:**
 Data is not committed to the repository (see data/README.md).
+
 To prepare locally:
-1. Create the following files:
+
+1. Use `QED.en-swa.en` as the English source file and `QED.en-swa.swa` as the Kiswahili target file.
+2. Create the following files:
    - data/raw/english-kiswahili/train.src (English sentences, one per line)
    - data/raw/english-kiswahili/train.tgt (Kiswahili translations, one per line)
-2. Run the preprocessing script:
+3. Run the preprocessing script:
    - Windows: $env:PYTHONPATH="backend"
      python backend/scripts/preprocess.py --src data/raw/english-kiswahili/train.src --tgt data/raw/english-kiswahili/train.tgt --output data/processed/english-kiswahili/
    - Linux/Mac: PYTHONPATH=backend python backend/scripts/preprocess.py --src data/raw/english-kiswahili/train.src --tgt data/raw/english-kiswahili/train.tgt --output data/processed/english-kiswahili/
@@ -55,7 +61,7 @@ To prepare locally:
 
 ## Known issues / limitations
 
-- Parallel corpus is currently being collected - contributions welcome
+- Corpus is currently a 3,000-pair QED subset - contributions welcome
 - Model not yet trained - Phase 1 implementation in progress
 
 ---
