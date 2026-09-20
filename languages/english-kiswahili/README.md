@@ -61,6 +61,22 @@ To prepare locally:
 Expected result: "Cleaned corpus: kept 3000 pairs, skipped 0", split into
 2,400 train / 300 val / 300 test pairs.
 
+**CSV version of the dataset:**
+The same 3,000 pairs are committed as a CSV so the team can inspect them
+without running the preparation steps above.
+
+- **File:** `languages/english-kiswahili/english-kiswahili.csv`
+- **Format:** UTF-8 CSV with a header row, every field quoted
+- **Columns:** `"English sentence"`, `"Swahili Translation"`
+- **Pairs:** 3,000 (one per row, excluding the header)
+
+It is generated from `all.src` / `all.tgt` with:
+
+    python backend/scripts/to_csv.py --src data/raw/english-kiswahili/all.src --tgt data/raw/english-kiswahili/all.tgt --output languages/english-kiswahili/english-kiswahili.csv
+
+The script stops if the two files have different line counts and skips any
+pair where either side is blank (0 were skipped for this dataset).
+
 ---
 
 ## Linguistic notes for contributors
