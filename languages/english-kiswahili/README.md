@@ -24,20 +24,42 @@ Kiswahili to La Lango AI directly serves over 200 million people.
 
 ## Dataset
 
-**Source of the parallel corpus:** Community collected - everyday conversational Kiswahili (Sanifu). Initial corpus of 20 sentence pairs covering common greetings and phrases, manually curated by contributor.
-**Corpus size:** 20 sentence pairs (initial — contributions welcome)
-**Domains covered:** Everyday conversation, greetings, common phrases, basic needs
-**License:** CC0 (Public Domain) — freely usable
+**Source of the parallel corpus:** QED English-Kiswahili parallel corpus subset.
+**Corpus size:** 3,000 sentence pairs
+**Domains covered:** Educational and conversational text
+**License:** See corpus LICENSE file from the QED dataset distribution
+
+This language pair uses a curated 3,000-pair subset, randomly sampled from the
+full QED English-Kiswahili corpus (18,192 raw pairs), after filtering and
+deduplication (see below). Using the full raw corpus directly will NOT match
+the documented 3,000-pair size and will include broken/misaligned lines.
+
 **How to obtain the data:**
 Data is not committed to the repository (see data/README.md).
+
 To prepare locally:
-1. Create the following files:
-   - data/raw/english-kiswahili/train.src (English sentences, one per line)
-   - data/raw/english-kiswahili/train.tgt (Kiswahili translations, one per line)
-2. Run the preprocessing script:
+
+1. Download the QED English-Kiswahili corpus from OPUS
+   (https://opus.nlpl.eu, QED corpus, en-sw language pair). This gives you
+   `QED.en-swa.en` (18,192 lines) and `QED.en-swa.swa` (18,192 lines).
+2. Filter and sample the corpus — do NOT use the raw files directly:
+   - Drop any pair where either side is empty or under 5 characters.
+   - Drop any pair where either side exceeds 180 characters (the raw corpus
+     contains some badly-aligned lines with 100s–1000+ words from merged
+     subtitle segments — these skew training if included).
+   - Deduplicate exact-match pairs (the raw corpus has ~900+ duplicates).
+   - Randomly sample 3,000 pairs from what remains (a fixed random seed is
+     recommended for reproducibility).
+3. Save the sampled pairs as:
+   - data/raw/english-kiswahili/all.src (English sentences, one per line)
+   - data/raw/english-kiswahili/all.tgt (Kiswahili translations, one per line)
+4. Run the preprocessing script, which cleans and splits into train/val/test (80/10/10):
    - Windows: $env:PYTHONPATH="backend"
-     python backend/scripts/preprocess.py --src data/raw/english-kiswahili/train.src --tgt data/raw/english-kiswahili/train.tgt --output data/processed/english-kiswahili/
-   - Linux/Mac: PYTHONPATH=backend python backend/scripts/preprocess.py --src data/raw/english-kiswahili/train.src --tgt data/raw/english-kiswahili/train.tgt --output data/processed/english-kiswahili/
+     python backend/scripts/preprocess.py --src data/raw/english-kiswahili/all.src --tgt data/raw/english-kiswahili/all.tgt --output data/processed/english-kiswahili/
+   - Linux/Mac: PYTHONPATH=backend python backend/scripts/preprocess.py --src data/raw/english-kiswahili/all.src --tgt data/raw/english-kiswahili/all.tgt --output data/processed/english-kiswahili/
+
+Expected result: "Cleaned corpus: kept 3000 pairs, skipped 0", split into
+2,400 train / 300 val / 300 test pairs.
 
 ---
 
@@ -55,7 +77,7 @@ To prepare locally:
 
 ## Known issues / limitations
 
-- Parallel corpus is currently being collected - contributions welcome
+- Corpus is currently a 3,000-pair QED subset - contributions welcome
 - Model not yet trained - Phase 1 implementation in progress
 
 ---
