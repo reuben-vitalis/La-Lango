@@ -80,16 +80,38 @@ which is why it was chosen instead.
 
 ### Preprocessing
 
-To split into train/val/test (80/10/10):
+`preprocess.py` reads two plain-text files (one sentence per line), not CSV,
+so preparing this dataset for training is a two-step process.
+
+**Step 1 — convert the CSV into `.src` / `.tgt` files:**
+
+```
+python backend/scripts/csv_to_parallel.py \
+  --csv languages/english-kiswahili/english-kiswahili-data.csv \
+  --output data/raw/english-kiswahili/
+```
+
+This writes `all.src` (English) and `all.tgt` (Kiswahili), line-aligned —
+line N of one file is the translation of line N of the other.
+
+**Step 2 — clean and split into train/val/test (80/10/10):**
 
 ```
 # Windows
 $env:PYTHONPATH="backend"
-python backend/scripts/preprocess.py --csv languages/english-kiswahili/english-kiswahili-data.csv --output data/processed/english-kiswahili/
+python backend/scripts/preprocess.py --src data/raw/english-kiswahili/all.src --tgt data/raw/english-kiswahili/all.tgt --output data/processed/english-kiswahili/
 
 # Linux/Mac
-PYTHONPATH=backend python backend/scripts/preprocess.py --csv languages/english-kiswahili/english-kiswahili-data.csv --output data/processed/english-kiswahili/
+PYTHONPATH=backend python backend/scripts/preprocess.py --src data/raw/english-kiswahili/all.src --tgt data/raw/english-kiswahili/all.tgt --output data/processed/english-kiswahili/
 ```
+
+Expected result: `preprocess.py` applies its own cleaning (default
+`--max-length` is 200 characters), which removes a further 769 pairs from the
+5,000. The final split is 3,384 train / 423 val / 424 test.
+
+Note: `data/raw/` and `data/processed/` are gitignored, so the files generated
+by these two steps stay on your machine. If `preprocess.py` gains native CSV
+support, step 1 becomes unnecessary.
 
 ---
 
