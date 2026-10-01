@@ -9,7 +9,7 @@ Two ways to run it
 ------------------
 1. Let the script download the corpus for you:
 
-       python build_globalvoices_csv.py --download \
+       python build_globalvoices_csv.py --download --target 5000 --lowercase \
            --out languages/english-kiswahili/english-kiswahili-data.csv
 
 2. Download the Moses zip yourself from opus.nlpl.eu (GlobalVoices → en-sw →
@@ -17,6 +17,7 @@ Two ways to run it
 
        python build_globalvoices_csv.py \
            --en GlobalVoices.en-sw.en --sw GlobalVoices.en-sw.sw \
+           --target 5000 --lowercase \
            --out languages/english-kiswahili/english-kiswahili-data.csv
 """
 
@@ -31,8 +32,9 @@ import urllib.request
 import zipfile
 from pathlib import Path
 
-ENG_COL = "English sentence"
-SWA_COL = "Swahili Translation"
+# Team format (see sample_data.csv): two columns, english,<target language>
+ENG_COL = "english"
+SWA_COL = "kiswahili"
 
 OPUS_ZIP = "https://object.pouta.csc.fi/OPUS-GlobalVoices/v2018q4/moses/en-sw.txt.zip"
 
@@ -99,6 +101,8 @@ def main():
     ap.add_argument("--max-words", type=int, default=50)
     ap.add_argument("--max-ratio", type=float, default=2.0,
                     help="Reject pairs where one side is this many times longer.")
+    ap.add_argument("--lowercase", action="store_true",
+                    help="Lowercase both columns before writing (team format).")
     ap.add_argument("--seed", type=int, default=42,
                     help="Random seed, so the sample is reproducible.")
     args = ap.parse_args()
@@ -184,17 +188,22 @@ def main():
         print(f"Randomly sampled {args.target} (seed {args.seed})")
 
     # Keep the sample in a stable order so the file diffs predictably.
+    if args.lowercase:
+        sample = [(eng.lower(), swa.lower()) for eng, swa in sample]
+
     sample.sort()
 
     out = Path(args.out)
     out.parent.mkdir(parents=True, exist_ok=True)
+    # Minimal quoting and LF line endings, matching sample_data.csv. Fields
+    # containing commas or quotes are still quoted, as the CSV format requires.
     with out.open("w", encoding="utf-8", newline="") as f:
-        w = csv.writer(f, quoting=csv.QUOTE_ALL)
+        w = csv.writer(f, quoting=csv.QUOTE_MINIMAL, lineterminator="\n")
         w.writerow([ENG_COL, SWA_COL])
         w.writerows(sample)
 
     print(f"\nWrote {len(sample)} pairs to {out}")
-    print(f'Columns: "{ENG_COL}", "{SWA_COL}"')
+    print(f"Columns: {ENG_COL},{SWA_COL}" + (" (lowercased)" if args.lowercase else ""))
     print("\nRemember: GlobalVoices is CC BY 3.0 — attribution is required.")
 
 

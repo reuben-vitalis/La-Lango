@@ -23,8 +23,8 @@ import csv
 import os
 import sys
 
-DEFAULT_SOURCE_COLUMN = "English sentence"
-DEFAULT_TARGET_COLUMN = "Swahili Translation"
+# Team format (see sample_data.csv): english,<target language>
+DEFAULT_SOURCE_COLUMN = "english"
 
 
 def main():
@@ -41,8 +41,9 @@ def main():
         help=f"CSV column holding the source text. Default: {DEFAULT_SOURCE_COLUMN!r}"
     )
     parser.add_argument(
-        "--target-column", default=DEFAULT_TARGET_COLUMN,
-        help=f"CSV column holding the translation. Default: {DEFAULT_TARGET_COLUMN!r}"
+        "--target-column", default=None,
+        help="CSV column holding the translation. Default: the first column "
+             "that is not the source column."
     )
     parser.add_argument(
         "--prefix", default="all",
@@ -60,6 +61,15 @@ def main():
         if reader.fieldnames is None:
             print(f"Error: {args.csv} appears to be empty.")
             sys.exit(1)
+
+        if args.target_column is None:
+            others = [c for c in reader.fieldnames if c != args.source_column]
+            if not others:
+                print(f"Error: no target column found in {reader.fieldnames}")
+                sys.exit(1)
+            args.target_column = others[0]
+            print(f"  Using columns: source={args.source_column!r}, "
+                  f"target={args.target_column!r}")
 
         missing = [
             column for column in (args.source_column, args.target_column)
